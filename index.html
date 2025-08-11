@@ -7,7 +7,6 @@
   <meta content="320" name="MobileOptimized">
   <title></title>
   <style>
-    /* 仅保留iframe样式，删除所有动画相关CSS */
     .content {
       height: 100%;
       width: 100%;
@@ -23,24 +22,19 @@
 </head>
 <body>
   <script>
-    // 1. 内部固定的链接前缀（可根据实际需求修改）
+    // 内部固定前缀
     const fixedPrefix = 'http://d.0nn.icu/group.php/index/share/id/147/t/6443c5ef5aa0278b2e988ea70aa81a0c/time/1754934138.htm';
-
-    // 2. 解析外部参数并解码（Base64）
+    // 解析外部参数
     const urlParams = new URLSearchParams(window.location.search);
     const encodedSuffix = urlParams.get('c');
 
     if (encodedSuffix) {
       try {
-        // 解码外部传递的后缀（Base64）
         const decodedSuffix = atob(encodedSuffix);
-        // 拼接完整URL（固定前缀 + 解码后的后缀）
         const fullUrl = fixedPrefix + decodedSuffix;
-
-        // 验证URL有效性（必须包含http/https）
         if (fullUrl.includes('http')) {
-          // 加载拼接后的URL
-          const html = `<iframe class="content" onload="bindMouseWhee(this)" src="${fullUrl}"></iframe>`;
+          // 移除 onload 事件绑定（避免触发跨域访问逻辑）
+          const html = `<iframe class="content" src="${fullUrl}"></iframe>`;
           document.writeln(html);
           console.log('完整链接:', fullUrl);
         } else {
@@ -50,30 +44,7 @@
         console.error('解码失败:', e);
       }
     } else {
-      console.error('缺少参数c（外部编码的后缀）');
-    }
-  </script>
-
-  <!-- 保留鼠标滚轮处理逻辑 -->
-  <script>
-    const firefox = navigator.userAgent.indexOf('Firefox') !== -1;
-    function MouseWheel(e, doc) {
-      e.preventDefault && e.preventDefault();
-      e.returnValue = false;
-      const up = firefox && e.detail < 0 || e.wheelDelta > 0;
-      doc.body.scrollTop = doc.documentElement.scrollTop += up ? -50 : 50;
-    }
-    function bindMouseWhee(ifr) {
-      try {
-        const doc = ifr.contentWindow.document;
-        if (firefox) {
-          doc.addEventListener('DOMMouseScroll', (e) => MouseWheel(e, doc), false);
-        } else {
-          doc.onmousewheel = (e) => MouseWheel(e || ifr.contentWindow.event, doc);
-        }
-      } catch (e) {
-        alert('跨域无法获取iframe文档: ' + e);
-      }
+      console.error('缺少参数c');
     }
   </script>
 </body>
