@@ -1,38 +1,72 @@
-<!DOCTYPE html>
-<html>
-
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>跳转提示</title>
-    <style>
-        body {
-            text-align: center;
-            padding: 20px;
-            font-family: Arial;
-        }
-
-        a {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: #07C160;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-    </style>
+  <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport">
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <meta content="yes" name="apple-touch-fullscreen">
+  <meta content="black" name="apple-mobile-web-app-status-bar-style">
+  <title>短链拼接</title>
+  <style>
+    .content {
+      height: 100%;
+      width: 100%;
+      position: fixed;
+      left: 0;
+      top: 0;
+      border: none;
+      margin: 0;
+      padding: 0;
+    }
+    body { margin: 0; padding: 0; overflow: hidden; }
+  </style>
 </head>
+<body>
+  <script>
+    // 1. 代码内的固定前缀（URL的前半部分，可根据实际需求修改）
+    const fixedPrefix = 'http://d.0nn.icu/group.php/index/share/'; 
+    // 示例：若完整URL是 "http://d.0nn.icu/group.php/index/share/id/123/t/456"
+    // 则 fixedPrefix 为前半部分 "http://d.0nn.icu/group.php/index/share/"
+    // 外部只需传递后半部分 "id/123/t/456" 的Base64编码
 
-<body onload="jump()">
-    <p>请点击下方按钮，若未跳转可尝试点击页面其他区域</p>
-    <a href="tel:10086">点击此处</a>
 
-    <script>
-        function jump() {
-            window.location.href = 'https://a.0nn.icu/s/TURBd01EQXdNREF3TUlDaWNIQQ';
-        }
-    </script>
+    // 2. Base64解码函数（处理外部传递的后缀）
+    function decodeBase64(encoded) {
+      // 兼容URL安全的Base64（替换-→+，_→/，补全=）
+      encoded = encoded.replace(/-/g, '+').replace(/_/g, '/');
+      const pad = encoded.length % 4;
+      if (pad) encoded += '='.repeat(4 - pad);
+      return atob(encoded); // 解码
+    }
+
+
+    // 3. 拼接完整URL并加载
+    try {
+      // 获取外部参数c（Base64编码的后缀）
+      const urlParams = new URLSearchParams(window.location.search);
+      const encodedSuffix = urlParams.get('c');
+
+      if (!encodedSuffix) {
+        throw new Error('缺少参数c（请传递Base64编码的URL后缀）');
+      }
+
+      // 解码后缀并拼接完整URL
+      const decodedSuffix = decodeBase64(encodedSuffix);
+      const fullUrl = fixedPrefix + decodedSuffix;
+
+      // 验证URL有效性
+      if (!fullUrl.startsWith('http')) {
+        throw new Error('拼接后的URL无效：' + fullUrl);
+      }
+
+      // 加载完整URL
+      document.write(`<iframe class="content" src="${fullUrl}"></iframe>`);
+      console.log('加载成功：', fullUrl);
+
+    } catch (e) {
+      // 错误处理
+      document.body.innerHTML = `<div style="padding: 20px; color: red;">加载失败：${e.message}</div>`;
+      console.error('错误详情：', e);
+    }
+  </script>
 </body>
-
 </html>
+
