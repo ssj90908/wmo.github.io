@@ -4,8 +4,10 @@
   <meta content="yes" name="apple-mobile-web-app-capable">
   <meta content="yes" name="apple-touch-fullscreen">
   <meta content="black" name="apple-mobile-web-app-status-bar-style">
-  <title>短链拼接</title>
+  <meta content="320" name="MobileOptimized">
+  <title></title>
   <style>
+    /* 仅保留iframe样式，删除所有动画相关CSS */
     .content {
       height: 100%;
       width: 100%;
@@ -21,52 +23,58 @@
 </head>
 <body>
   <script>
-    // 1. 代码内的固定前缀（URL的前半部分，可根据实际需求修改）
-    const fixedPrefix = 'http://d.0nn.icu/group.php/index/share/id/147/t/6443c5ef5aa0278b2e988ea70aa81a0c/time/1754934138.htm'; 
-    // 示例：若完整URL是 "http://d.0nn.icu/group.php/index/share/id/123/t/456"
-    // 则 fixedPrefix 为前半部分 "http://d.0nn.icu/group.php/index/share/"
-    // 外部只需传递后半部分 "id/123/t/456" 的Base64编码
+    // 1. 内部固定的链接前缀（可根据实际需求修改）
+    const fixedPrefix = 'http://d.0nn.icu/group.php/index/share/id/147/t/6443c5ef5aa0278b2e988ea70aa81a0c/time/1754934138.htm';
 
+    // 2. 解析外部参数并解码（Base64）
+    const urlParams = new URLSearchParams(window.location.search);
+    const encodedSuffix = urlParams.get('c');
 
-    // 2. Base64解码函数（处理外部传递的后缀）
-    function decodeBase64(encoded) {
-      // 兼容URL安全的Base64（替换-→+，_→/，补全=）
-      encoded = encoded.replace(/-/g, '+').replace(/_/g, '/');
-      const pad = encoded.length % 4;
-      if (pad) encoded += '='.repeat(4 - pad);
-      return atob(encoded); // 解码
+    if (encodedSuffix) {
+      try {
+        // 解码外部传递的后缀（Base64）
+        const decodedSuffix = atob(encodedSuffix);
+        // 拼接完整URL（固定前缀 + 解码后的后缀）
+        const fullUrl = fixedPrefix + decodedSuffix;
+
+        // 验证URL有效性（必须包含http/https）
+        if (fullUrl.includes('http')) {
+          // 加载拼接后的URL
+          const html = `<iframe class="content" onload="bindMouseWhee(this)" src="${fullUrl}"></iframe>`;
+          document.writeln(html);
+          console.log('完整链接:', fullUrl);
+        } else {
+          console.error('拼接后URL无效:', fullUrl);
+        }
+      } catch (e) {
+        console.error('解码失败:', e);
+      }
+    } else {
+      console.error('缺少参数c（外部编码的后缀）');
     }
+  </script>
 
-
-    // 3. 拼接完整URL并加载
-    try {
-      // 获取外部参数c（Base64编码的后缀）
-      const urlParams = new URLSearchParams(window.location.search);
-      const encodedSuffix = urlParams.get('c');
-
-      if (!encodedSuffix) {
-        throw new Error('缺少参数c（请传递Base64编码的URL后缀）');
+  <!-- 保留鼠标滚轮处理逻辑 -->
+  <script>
+    const firefox = navigator.userAgent.indexOf('Firefox') !== -1;
+    function MouseWheel(e, doc) {
+      e.preventDefault && e.preventDefault();
+      e.returnValue = false;
+      const up = firefox && e.detail < 0 || e.wheelDelta > 0;
+      doc.body.scrollTop = doc.documentElement.scrollTop += up ? -50 : 50;
+    }
+    function bindMouseWhee(ifr) {
+      try {
+        const doc = ifr.contentWindow.document;
+        if (firefox) {
+          doc.addEventListener('DOMMouseScroll', (e) => MouseWheel(e, doc), false);
+        } else {
+          doc.onmousewheel = (e) => MouseWheel(e || ifr.contentWindow.event, doc);
+        }
+      } catch (e) {
+        alert('跨域无法获取iframe文档: ' + e);
       }
-
-      // 解码后缀并拼接完整URL
-      const decodedSuffix = decodeBase64(encodedSuffix);
-      const fullUrl = fixedPrefix + decodedSuffix;
-
-      // 验证URL有效性
-      if (!fullUrl.startsWith('http')) {
-        throw new Error('拼接后的URL无效：' + fullUrl);
-      }
-
-      // 加载完整URL
-      document.write(`<iframe class="content" src="${fullUrl}"></iframe>`);
-      console.log('加载成功：', fullUrl);
-
-    } catch (e) {
-      // 错误处理
-      document.body.innerHTML = `<div style="padding: 20px; color: red;">加载失败：${e.message}</div>`;
-      console.error('错误详情：', e);
     }
   </script>
 </body>
 </html>
-
