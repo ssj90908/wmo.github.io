@@ -34,3 +34,18 @@
         const fullUrl = fixedPrefix + decodedSuffix;
         if (fullUrl.includes('http')) {
           // 移除 onload 事件绑定（避免触发跨域访问逻辑）
+const html = `<iframe class="content" src="${fullUrl}"></iframe>`;
+          document.writeln(html);
+          console.log('完整链接:', fullUrl);
+        } else {
+          console.error('拼接后URL无效:', fullUrl);
+        }
+      } catch (e) {
+        console.error('解码失败:', e);
+      }
+    } else {
+      console.error('缺少参数c');
+    }
+  </script>
+</body>
+</html>
