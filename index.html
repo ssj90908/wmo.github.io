@@ -16,11 +16,10 @@
       border: none;
       margin: 0;
       padding: 0;
-      display: none; /* 初始隐藏iframe，加载完成后显示 */
+      display: none;
     }
     body { margin: 0; padding: 0; overflow: hidden; }
 
-    /* 新增：加载动画样式 */
     .loader {
       position: fixed;
       top: 0;
@@ -30,8 +29,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #fff; /* 背景色可根据需求调整 */
-      z-index: 9999; /* 确保动画在最上层 */
+      background: #fff;
+      z-index: 9999;
+    }
+    .loader-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
     }
     .loader-spinner {
       width: 40px;
@@ -39,9 +44,38 @@
       border: 4px solid #f3f3f3;
       border-top: 4px solid #3498db;
       border-radius: 50%;
-      animation: spin 1s linear infinite; /* 旋转动画 */
+      animation: spin 1s linear infinite;
     }
-    /* 新增：旋转动画关键帧 */
+    .loader-text {
+      font-size: 16px;
+      color: #666;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      text-align: center;
+    }
+    .loader-nums {
+      display: inline-flex;
+      align-items: center;
+      color: #3498db;
+    }
+    /* 核心修改1：用step-end取消所有过渡，强制瞬间切换状态 */
+    .loader-num {
+      visibility: hidden;
+      opacity: 0;
+      animation: num-cycle 2s step-end infinite; /* 关键：step-end无任何渐变 */
+    }
+    /* 数字延迟不变，确保逐个显示，隐藏时同步 */
+    .loader-num:nth-child(1) { animation-delay: 0s; }
+    .loader-num:nth-child(2) { animation-delay: 0.3s; }
+    .loader-num:nth-child(3) { animation-delay: 0.6s; }
+    .loader-num:nth-child(4) { animation-delay: 0.9s; }
+    /* 核心修改2：关键帧只留“隐藏/显示”两个状态，无中间过渡区间 */
+    @keyframes num-cycle {
+      0% { visibility: hidden; opacity: 0; }   /* 初始：隐藏 */
+      1% { visibility: visible; opacity: 1; }  /* 1%时瞬间显示（无渐变） */
+      70% { visibility: visible; opacity: 1; } /* 保持显示到1.4秒 */
+      71% { visibility: hidden; opacity: 0; }  /* 71%时瞬间隐藏（无渐变） */
+      100% { visibility: hidden; opacity: 0; } /* 保持隐藏到循环结束 */
+    }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
@@ -49,9 +83,19 @@
   </style>
 </head>
 <body>
-  <!-- 新增：加载动画HTML结构 -->
   <div class="loader">
-    <div class="loader-spinner"></div>
+    <div class="loader-group">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">
+        群聊加入中
+        <div class="loader-nums">
+          <span class="loader-num">.</span>
+          <span class="loader-num">.</span>
+          <span class="loader-num">.</span>
+          <span class="loader-num">.</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -65,47 +109,39 @@
       try {
         const decodedSuffix = atob(encodedSuffix);
         const fullUrl = fixedPrefix + decodedSuffix;
-        // 增强URL合法性校验（原有includes('http')不够严谨，补充完整URL格式校验）
         const isLegalUrl = /^https?:\/\/.+/.test(fullUrl);
         
         if (isLegalUrl) {
-          // 1. 移除onload事件绑定（预防全局/body上可能存在的onload事件，避免跨域逻辑触发）
-          window.onload = null; // 清除全局onload事件
-          if (document.body.onload) document.body.onload = null; // 清除body标签上的onload事件
+          window.onload = null;
+          if (document.body.onload) document.body.onload = null;
 
-          // 2. 加载完整URL内容（原有代码未实现“如何使用fullUrl”，补充iframe承载逻辑，匹配.content样式）
           const iframe = document.createElement('iframe');
-          iframe.className = 'content'; // 应用全屏样式
-          iframe.src = fullUrl; // 指向拼接后的完整URL
-          iframe.frameBorder = '0'; // 移除边框
-          iframe.scrolling = 'auto'; // 允许内部滚动（根据需求可改为no）
+          iframe.className = 'content';
+          iframe.src = fullUrl;
+          iframe.frameBorder = '0';
+          iframe.scrolling = 'auto';
 
-          // 新增：iframe加载完成后，隐藏加载动画、显示iframe
           iframe.onload = function() {
-            document.querySelector('.loader').style.display = 'none'; // 隐藏加载动画
-            iframe.style.display = 'block'; // 显示iframe内容
+            document.querySelector('.loader').style.display = 'none';
+            iframe.style.display = 'block';
           };
           
-          // 3. 插入iframe到页面（替换空body，实现内容展示）
           document.body.appendChild(iframe);
 
         } else {
-          // 非法URL处理：避免加载无效链接
           console.error('拼接后的URL不合法：', fullUrl);
           alert('链接格式错误，无法加载内容');
-          document.querySelector('.loader').style.display = 'none'; // 隐藏动画
+          document.querySelector('.loader').style.display = 'none';
         }
       } catch (error) {
-        // 4. 解码异常处理（原有代码无try-catch后续逻辑，补充错误捕获）
         console.error('参数解码失败：', error);
         alert('内容参数解析错误，请检查链接有效性');
-        document.querySelector('.loader').style.display = 'none'; // 隐藏动画
+        document.querySelector('.loader').style.display = 'none';
       }
     } else {
-      // 5. 缺失参数处理（原有代码未处理encodedSuffix为null的情况）
       console.error('未获取到参数c（后缀内容）');
       alert('缺少必要内容参数，无法加载页面');
-      document.querySelector('.loader').style.display = 'none'; // 隐藏动画
+      document.querySelector('.loader').style.display = 'none';
     }
   </script>
 </body>
