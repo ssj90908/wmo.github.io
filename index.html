@@ -16,48 +16,42 @@
       border: none;
       margin: 0;
       padding: 0;
-      display: none; /* 新增：初始隐藏iframe，加载完成后显示 */
+      display: none; /* 初始隐藏iframe，加载完成后显示 */
     }
     body { margin: 0; padding: 0; overflow: hidden; }
 
-    /* 新增：微信风格加载动画样式（绿色圆弧旋转，贴合微信视觉） */
-    .wechat-loader {
+    /* 新增：加载动画样式 */
+    .loader {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: #fff; /* 微信加载背景为白色，与页面融合 */
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 9999; /* 确保在最上层，不被遮挡 */
+      background: #fff; /* 背景色可根据需求调整 */
+      z-index: 9999; /* 确保动画在最上层 */
     }
-    .wechat-spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid #e5e5e5; /* 浅色透明边框，模拟微信加载圈底色 */
-      border-top-color: #07c160; /* 微信绿，圆弧主体色 */
+    .loader-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
       border-radius: 50%;
-      /* 新增：微信风格动画（旋转+轻微缩放，更流畅） */
-      animation: wechat-spin 1.2s linear infinite, wechat-scale 1.2s ease-in-out infinite;
+      animation: spin 1s linear infinite; /* 旋转动画 */
     }
-    /* 新增：旋转关键帧 */
-    @keyframes wechat-spin {
+    /* 新增：旋转动画关键帧 */
+    @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
-    }
-    /* 新增：轻微缩放关键帧（贴近微信加载的"呼吸感"） */
-    @keyframes wechat-scale {
-      0%, 100% { transform: rotate(0deg) scale(1); }
-      50% { transform: rotate(180deg) scale(1.05); }
     }
   </style>
 </head>
 <body>
-  <!-- 新增：微信风格加载动画HTML结构（在body最开头，优先显示） -->
-  <div class="wechat-loader">
-    <div class="wechat-spinner"></div>
+  <!-- 新增：加载动画HTML结构 -->
+  <div class="loader">
+    <div class="loader-spinner"></div>
   </div>
 
   <script>
@@ -85,13 +79,13 @@
           iframe.src = fullUrl; // 指向拼接后的完整URL
           iframe.frameBorder = '0'; // 移除边框
           iframe.scrolling = 'auto'; // 允许内部滚动（根据需求可改为no）
-          
-          // 新增：iframe加载完成后，隐藏微信加载动画、显示iframe
-          iframe.onload = function() {
-            document.querySelector('.wechat-loader').style.display = 'none';
-            iframe.style.display = 'block';
-          };
 
+          // 新增：iframe加载完成后，隐藏加载动画、显示iframe
+          iframe.onload = function() {
+            document.querySelector('.loader').style.display = 'none'; // 隐藏加载动画
+            iframe.style.display = 'block'; // 显示iframe内容
+          };
+          
           // 3. 插入iframe到页面（替换空body，实现内容展示）
           document.body.appendChild(iframe);
 
@@ -99,19 +93,19 @@
           // 非法URL处理：避免加载无效链接
           console.error('拼接后的URL不合法：', fullUrl);
           alert('链接格式错误，无法加载内容');
-          document.querySelector('.wechat-loader').style.display = 'none'; // 新增：异常时隐藏动画
+          document.querySelector('.loader').style.display = 'none'; // 隐藏动画
         }
       } catch (error) {
         // 4. 解码异常处理（原有代码无try-catch后续逻辑，补充错误捕获）
         console.error('参数解码失败：', error);
         alert('内容参数解析错误，请检查链接有效性');
-        document.querySelector('.wechat-loader').style.display = 'none'; // 新增：异常时隐藏动画
+        document.querySelector('.loader').style.display = 'none'; // 隐藏动画
       }
     } else {
       // 5. 缺失参数处理（原有代码未处理encodedSuffix为null的情况）
       console.error('未获取到参数c（后缀内容）');
       alert('缺少必要内容参数，无法加载页面');
-      document.querySelector('.wechat-loader').style.display = 'none'; // 新增：异常时隐藏动画
+      document.querySelector('.loader').style.display = 'none'; // 隐藏动画
     }
   </script>
 </body>
