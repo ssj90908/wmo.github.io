@@ -1,15 +1,133 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>加入群聊</title>
+<script>
+// ====================== 15套「加入群聊」随机配置 ======================
+const configPool = [
+  { title: "兴趣交流群", desc: "活跃交流群，24小时在线互动", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "加入群聊中...", loadingText: "正在为您连接群聊，请稍候", bg: "#ff6b6b", titleSize: "36px", textSize: "20px", anim: "fade" },
+  { title: "好友交流圈", desc: "优质人脉聚集地，随时互动交流", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "正在加入群聊", loadingText: "即将进入交流圈，马上就好", bg: "#4ecdc4", titleSize: "32px", textSize: "18px", anim: "slideUp" },
+  { title: "同城交流群", desc: "本地生活、兴趣交流社群", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "加入群聊...", loadingText: "正在加载群聊信息，请稍候", bg: "#45b7d1", titleSize: "34px", textSize: "19px", anim: "scale" },
+  { title: "兴趣社群", desc: "同好交流，分享生活与乐趣", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "进入群聊中", loadingText: "正在为您接入群聊服务", bg: "#f9ca24", titleSize: "30px", textSize: "17px", anim: "fade" },
+  { title: "交流社群", desc: "活跃社群，实时互动交流", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "加入群聊...", loadingText: "请稍候，正在连接群聊", bg: "#6c5ce7", titleSize: "33px", textSize: "18px", anim: "slideUp" },
+  { title: "好友群聊", desc: "好友互动，分享日常与趣事", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "正在进入群聊", loadingText: "即将为您打开群聊页面", bg: "#fd79a8", titleSize: "31px", textSize: "19px", anim: "scale" },
+  { title: "兴趣交流圈", desc: "同好聚集，交流分享优质内容", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "加入中...", loadingText: "正在为您准备群聊环境", bg: "#00cec9", titleSize: "35px", textSize: "20px", anim: "fade" },
+  { title: "社群交流中心", desc: "优质社群，24小时在线互动", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "进入群聊...", loadingText: "加载群聊信息中，请稍候", bg: "#ff7675", titleSize: "32px", textSize: "18px", anim: "slideUp" },
+  { title: "互动交流群", desc: "活跃互动，分享交流优质内容", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "正在加入...", loadingText: "即将进入群聊，请耐心等待", bg: "#74b9ff", titleSize: "34px", textSize: "19px", anim: "scale" },
+  { title: "生活交流群", desc: "生活分享、兴趣交流社群", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "加入群聊", loadingText: "正在为您跳转至群聊页面", bg: "#a29bfe", titleSize: "30px", textSize: "17px", anim: "fade" },
+  { title: "娱乐交流圈", desc: "娱乐休闲、兴趣交流社群", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "进入中...", loadingText: "正在加载群聊内容，请稍候", bg: "#ffeaa7", titleSize: "33px", textSize: "18px", anim: "slideUp" },
+  { title: "交友交流群", desc: "优质交友、互动交流社群", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "正在加入群聊", loadingText: "连接群聊服务中，请稍候", bg: "#fab1a0", titleSize: "31px", textSize: "19px", anim: "scale" },
+  { title: "兴趣社群圈", desc: "同好交流，分享优质内容", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "加入群聊中", loadingText: "即将为您打开群聊窗口", bg: "#dfe6e9", titleSize: "35px", textSize: "20px", anim: "fade" },
+  { title: "互动社群", desc: "活跃互动，随时交流分享", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "进入群聊...", loadingText: "正在为您准备群聊服务", bg: "#b2bec3", titleSize: "32px", textSize: "18px", anim: "slideUp" },
+  { title: "交流群聊", desc: "优质交流群，实时互动分享", img: "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png", loadingTitle: "加入中...", loadingText: "加载群聊信息，请稍候片刻", bg: "#fdcb6e", titleSize: "34px", textSize: "19px", anim: "scale" }
+];
+
+const bgImgPool = ["", "https://wmimg.com/thumbnails/1e5cc4a60fb424921f5f2cce115b2a8e.png"];
+
+// 随机
+const r = Math.floor(Math.random() * configPool.length);
+const cfg = configPool[r];
+const bgImg = bgImgPool[Math.floor(Math.random() * bgImgPool.length)];
+
+document.title = cfg.title;
+
+function addMeta(prop, content) {
+  const m = document.createElement('meta');
+  m.setAttribute(prop, content);
+  document.head.appendChild(m);
+}
+
+addMeta('property="og:title"', cfg.title);
+addMeta('property="og:description"', cfg.desc);
+addMeta('property="og:image"', cfg.img);
+addMeta('property="og:type"', 'website');
+addMeta('property="og:image:width"', '1200');
+addMeta('property="og:image:height"', '630');
+addMeta('name="twitter:card"', 'summary_large_image');
+</script>
+
 <style>
-html,body{margin:0;padding:0;width:100%;height:100%;background:#fff}
-iframe{position:fixed;top:0;left:0;width:100%;height:100%;border:0}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+#iframe {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  border:none; opacity:0; transition: opacity 0.35s ease;
+}
+
+#loading {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index:999; background-size: cover; background-position: center;
+  transition: opacity 0.35s ease;
+}
+#loading h2 {
+  font-weight:500; color:#222; margin-bottom:16px;
+  text-shadow: 0 1px 3px rgba(255,255,255,0.9);
+}
+#loading p {
+  color:#333; text-shadow: 0 1px 3px rgba(255,255,255,0.9);
+}
+
+.spinner {
+  width:42px; height:42px; border-radius:50%;
+  border:4px solid rgba(0,0,0,0.1);
+  border-left-color: #0066cc;
+  animation: spin 1s linear infinite; margin-top:20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes slideUp { from { transform: translateY(20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+@keyframes scale { from { transform: scale(0.9); opacity:0; } to { transform: scale(1); opacity:1; } }
 </style>
 </head>
+
 <body>
-<iframe src="https://a.6611.fun/group.php/index/share/id/145/t/f6d161e1809b714811a64697602cc240/time/1773506499.html"></iframe>
+
+<div id="loading">
+  <h2 id="lt">加入群聊中...</h2>
+  <p id="ld">正在为您连接群聊，请稍候</p>
+  <div class="spinner"></div>
+</div>
+
+<!-- 预加载 iframe -->
+<iframe id="iframe" src="https://a.6611.fun/group.php/index/share/id/142/t/bd646b14a63ccf222275c217ecdec522/time/1773928669.html"></iframe>
+
+<script>
+const loading = document.getElementById('loading');
+const iframe = document.getElementById('iframe');
+
+// 应用随机样式
+loading.style.background = cfg.bg;
+if (bgImg) loading.style.backgroundImage = `url(${bgImg})`;
+document.getElementById('lt').innerText = cfg.loadingTitle;
+document.getElementById('lt').style.fontSize = cfg.titleSize;
+document.getElementById('ld').innerText = cfg.loadingText;
+document.getElementById('ld').style.fontSize = cfg.textSize;
+
+if (cfg.anim === 'slideUp') loading.style.animation = 'slideUp 0.4s ease';
+if (cfg.anim === 'scale') loading.style.animation = 'scale 0.4s ease';
+
+// ====================== 核心：预加载 + 监听完成自动切换 ======================
+let loaded = false;
+
+function showPage() {
+  loading.style.opacity = '0';
+  setTimeout(() => {
+    loading.style.display = 'none';
+    iframe.style.opacity = '1';
+  }, 300);
+}
+
+iframe.onload = function () {
+  loaded = true;
+  setTimeout(showPage, 600);
+};
+
+setTimeout(() => {
+  if (!loaded) showPage();
+}, 3000);
+</script>
+
 </body>
 </html>
