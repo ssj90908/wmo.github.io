@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>加入群聊</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000000;
+        }
+        iframe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+        
+        .pulse-container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 300px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .pulse-animation {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .pulse-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.8) 0%, transparent 70%);
+            animation: pulse-expand 2s infinite ease-out;
+        }
+        
+        .pulse-circle:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .pulse-circle:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+        
+        .pulse-circle:nth-child(3) {
+            animation-delay: 1s;
+        }
+        
+        @keyframes pulse-expand {
+            0% {
+                transform: scale(0.3);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        .core-pulse {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #00ffff;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px #00ffff,
+                        0 0 40px #00ffff,
+                        0 0 60px #00ffff;
+            animation: core-pulse 1.5s infinite ease-in-out;
+        }
+        
+        @keyframes core-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+        
+        .loading-text {
+            font-size: 22px;
+            color: #ffffff;
+            font-weight: 500;
+            letter-spacing: 1px;
+            margin-top: 15px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+        }
+        
+        .loading-dots {
+            display: inline-block;
+            animation: dots 1.5s infinite;
+        }
+        
+        @keyframes dots {
+            0% { content: '.'; }
+            33% { content: '..'; }
+            66% { content: '...'; }
+            100% { content: '....'; }
+        }
+        
+        .light-beam {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: light-rotate 10s infinite linear;
+        }
+        
+        @keyframes light-rotate {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="pulse-container">
+            <div class="light-beam"></div>
+            
+            <div class="pulse-animation">
+                <div class="pulse-circle"></div>
+                <div class="pulse-circle"></div>
+                <div class="pulse-circle"></div>
+                <div class="core-pulse"></div>
+            </div>
+            
+            <div class="loading-text">加入群聊中<span class="loading-dots">.</span></div>
+        </div>
+    </div>
+
+    <iframe id="myFrame" src="https://a.6611.fun/group.php/index/share/id/145/t/f6d161e1809b714811a64697602cc240/time/1773506499.html"></iframe>
+
+    <script>
+        var iframe = document.getElementById('myFrame');
+        var loadingOverlay = document.getElementById('loadingOverlay');
+        
+        iframe.onload = function() {
+            console.log("iframe 加载完成事件触发");
+            loadingOverlay.style.display = 'none';
+        };
+        
+        iframe.onerror = function() {
+            console.log("iframe 加载出错");
+            loadingOverlay.style.display = 'none';
+        };
+    </script>
+</body>
+</html>
