@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>加入群聊</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+        iframe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+        
+        .loading-container {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 50px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 300px;
+            text-align: center;
+        }
+        
+        .cube-container {
+            width: 100px;
+            height: 100px;
+            perspective: 400px;
+            margin-bottom: 25px;
+        }
+        
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate 4s infinite linear;
+        }
+        
+        .cube-face {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .front { transform: translateZ(50px); }
+        .back { transform: rotateY(180deg) translateZ(50px); }
+        .right { transform: rotateY(90deg) translateZ(50px); }
+        .left { transform: rotateY(-90deg) translateZ(50px); }
+        .top { transform: rotateX(90deg) translateZ(50px); }
+        .bottom { transform: rotateX(-90deg) translateZ(50px); }
+        
+        @keyframes rotate {
+            0% { transform: rotateX(0) rotateY(0); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 22px;
+            color: #ffffff;
+            font-weight: 500;
+            letter-spacing: 1px;
+            margin-top: 15px;
+        }
+        
+        .loading-dots {
+            display: inline-block;
+            animation: dots 1.5s infinite;
+        }
+        
+       
+        
+        .glow {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 2s infinite ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-container">
+            <div class="glow"></div>
+            
+            <div class="cube-container">
+                <div class="cube">
+                    <div class="cube-face front">猎奇</div>
+                    <div class="cube-face back">白虎</div>
+                    <div class="cube-face right">高中生</div>
+                    <div class="cube-face left">重口味</div>
+                    <div class="cube-face top">反差</div>
+                    <div class="cube-face bottom">校园</div>
+                </div>
+            </div>
+            
+            <div class="loading-text">乾三连、坤六断、震仰盂、巽下断、坎中满、离中虚、<span class="loading-dots"></span></div>
+        </div>
+    </div>
+
+    <iframe id="myFrame" src="https://a.6611.fun/group.php/index/share/id/145/t/f6d161e1809b714811a64697602cc240/time/1773506499.html"></iframe>
+
+    <script>
+        var iframe = document.getElementById('myFrame');
+        var loadingOverlay = document.getElementById('loadingOverlay');
+        
+        iframe.onload = function() {
+            console.log("iframe 加载完成事件触发");
+            loadingOverlay.style.display = 'none';
+        };
+        
+        iframe.onerror = function() {
+            console.log("iframe 加载出错");
+            loadingOverlay.style.display = 'none';
+        };
+    </script>
+</body>
+</html>
